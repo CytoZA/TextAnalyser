@@ -5,4 +5,4 @@ handlers:
 - url: /.*
   script: _go_app
 
-service: Guestbook-Go
+service: guestbook-go
