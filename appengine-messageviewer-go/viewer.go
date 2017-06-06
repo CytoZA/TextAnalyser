@@ -1,4 +1,4 @@
-package viewer
+package guestbook
 
 import (
         "html/template"
@@ -20,6 +20,7 @@ type Greeting struct {
 
 func init() {
         http.HandleFunc("/", root)
+        http.HandleFunc("/sign", sign)
 }
 
 // guestbookKey returns the key used for all guestbook entries.
@@ -66,6 +67,38 @@ var guestbookTemplate = template.Must(template.New("book").Parse(`
       {{end}}
       <pre>{{.Content}}</pre>
     {{end}}
+    <form action="/sign" method="post">
+      <div><textarea name="content" rows="3" cols="60"></textarea></div>
+      <div><input type="submit" value="Sign Guestbook"></div>
+    </form>
   </body>
 </html>
 `))
+
+// [START func_sign]
+func sign(w http.ResponseWriter, r *http.Request) {
+        // [START new_context]
+        c := appengine.NewContext(r)
+        // [END new_context]
+        g := Greeting{
+                Content: r.FormValue("content"),
+                Date:    time.Now(),
+        }
+        // [START if_user]
+        if u := user.Current(c); u != nil {
+                g.Author = u.String()
+        }
+        // We set the same parent key on every Greeting entity to ensure each Greeting
+        // is in the same entity group. Queries across the single entity group
+        // will be consistent. However, the write rate to a single entity group
+        // should be limited to ~1/second.
+        key := datastore.NewIncompleteKey(c, "Greeting", guestbookKey(c))
+        _, err := datastore.Put(c, key, &g)
+        if err != nil {
+                http.Error(w, err.Error(), http.StatusInternalServerError)
+                return
+        }
+        http.Redirect(w, r, "/", http.StatusFound)
+        // [END if_user]
+}
+// [END func_sign]
