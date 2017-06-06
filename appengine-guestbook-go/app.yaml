@@ -4,5 +4,3 @@ api_version: go1
 handlers:
 - url: /add/.*
   script: _go_app
-
-service: guestbook-go
