@@ -56,7 +56,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 var guestbookTemplate = template.Must(template.New("book").Parse(`
 <html>
   <head>
-    <title>Go Guestbook</title>
+    <title>Go Guestbook Viewer</title>
   </head>
   <body>
     {{range .}}
@@ -67,10 +67,6 @@ var guestbookTemplate = template.Must(template.New("book").Parse(`
       {{end}}
       <pre>{{.Content}}</pre>
     {{end}}
-    <form action="/sign" method="post">
-      <div><textarea name="content" rows="3" cols="60"></textarea></div>
-      <div><input type="submit" value="Sign Guestbook"></div>
-    </form>
   </body>
 </html>
 `))
