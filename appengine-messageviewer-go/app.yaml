@@ -1,0 +1,8 @@
+runtime: go
+api_version: go1
+
+handlers:
+- url: /view/.*
+  script: _go_app
+
+service: messageviewer-go
